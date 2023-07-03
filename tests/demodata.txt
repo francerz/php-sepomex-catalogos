@@ -1,0 +1,6 @@
+Este archivo es para pruebas unicamente, no contiene datos reales del catalogo
+d_codigo|d_asenta|d_tipo_asenta|D_mnpio|d_estado|d_ciudad|d_CP|c_estado|c_oficina|c_CP|c_tipo_asenta|c_mnpio|id_asenta_cpcons|d_zona|c_cve_ciudad
+00001|Candelaria|Colonia|Agustin Yañez|Aguascalientes|Aguascalientes|00001|01|00100||09|023|0045|Urbano|01
+00001|El Dorado|Pueblo|Las Peras|Aguascalientes||00001|01|00100||28|012|0345|Rural|
+00020|Monarcas|Colonia|Santa Leticia|Baja California||00023|02|00201||09|012|0012|Urbano|
+00021|Reyes|Colonia|Santa Leticia|Baja California||00024|02|00201||09|012|0013|Urbano|
