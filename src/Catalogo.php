@@ -28,12 +28,10 @@ class Catalogo
         }
 
         // READS FILE LINE BY LINE
-        $time = microtime(true);
         while ($line = trim(fgets($file))) {
             $line = mb_convert_encoding($line, 'UTF-8', 'ISO-8859-1');
             $rows[] = DataRow::fromLine($line);
         }
-        echo sprintf("\n\nTIME: %.4f\n\n", microtime(true) - $time);
 
         // CREATES INDEX WITH ROWS
         $rowsIndex = new Index($rows, [
@@ -58,36 +56,29 @@ class Catalogo
         $ciudades = [];
         $asentamientos = [];
         foreach ($rowsIndex->getColumnValues('claveEstado') as $ce) {
-            /** @var DataRow */
-            $re = $rowsIndex->first(['claveEstado' => $ce]);
+            /** @var DataRow[] */
+            $estadoData = $rowsIndex[['claveEstado' => $ce]];
+            $re = reset($estadoData);
             $estados[$ce] = $estado = new Estado($re->claveEstado, $re->nombreEstado);
 
             // CREATES INDEX DE ESTADO
-            $estadoIndex = new Index($rowsIndex[['claveEstado' => $ce]], ['claveMunicipio']);
-            foreach ($estadoIndex->getColumnValues('claveMunicipio') as $cm) {
-                /** @var DataRow */
-                $rm = $estadoIndex->first(['claveMunicipio' => $cm]);
-                $municipios["{$ce}-{$cm}"] = $municipio = new Municipio($estado, $cm, $rm->nombreMunicipio);
-                $municipioIndex = new Index($estadoIndex[['claveMunicipio' => $cm]], [
-                    'claveCiudad',
-                    'claveAsentamiento'
-                ]);
-                foreach ($municipioIndex->getColumnValues('claveCiudad') as $cc) {
-                    if (empty($cc)) {
-                        continue;
-                    }
-                    /** @var DataRow */
-                    $rc = $municipioIndex->first(['claveCiudad' => $cc]);
-                    if (is_null($rc)) {
-                        continue;
-                    }
-                    $ciudades["{$ce}-{$cm}-{$cc}"] = new Ciudad(
-                        $estado,
-                        $municipio,
-                        $rc->claveCiudad,
-                        $rc->nombreCiudad
-                    );
+            $estadoIndex = new Index($estadoData, ['claveMunicipio', 'claveCiudad']);
+
+            foreach ($estadoIndex->getColumnValues('claveCiudad') as $cc) {
+                if (empty($cc)) {
+                    continue;
                 }
+                /** @var DataRow */
+                $rc = $estadoIndex->first(['claveCiudad' => $cc]);
+                $ciudades["{$ce}-{$cc}"] = new Ciudad($estado, $rc->claveCiudad, $rc->nombreCiudad);
+            }
+            foreach ($estadoIndex->getColumnValues('claveMunicipio') as $cm) {
+                /** @var DataRow[] */
+                $municipioData = $estadoIndex[['claveMunicipio' => $cm]];
+                $rm = reset($municipioData);
+                $municipios["{$ce}-{$cm}"] = $municipio = new Municipio($estado, $cm, $rm->nombreMunicipio);
+
+                $municipioIndex = new Index($municipioData, ['claveAsentamiento']);
                 foreach ($municipioIndex->getColumnValues('claveAsentamiento') as $ca) {
                     /** @var DataRow */
                     $ra = $municipioIndex->first(['claveAsentamiento' => $ca]);
@@ -100,7 +91,7 @@ class Catalogo
                         $ra->zona,
                         $ra->codigoPostal,
                         $ra->codigoPostalOficina,
-                        $ciudades["{$ce}-{$cm}-{$ra->claveCiudad}"] ?? null
+                        $ciudades["{$ce}-{$ra->claveCiudad}"] ?? null
                     );
                 }
             }
