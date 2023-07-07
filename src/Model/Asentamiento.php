@@ -2,18 +2,29 @@
 
 namespace Francerz\SepomexCatalogos\Model;
 
+/**
+ * @property-read Estado $estado
+ * @property-read Municipio $municipio
+ * @property-read string $clave
+ * @property-read string $nombre
+ * @property-read string $zona
+ * @property-read string $codigoPostal
+ * @property-read string $codigoPostalOficina
+ * @property-read TipoAsentamiento $tipoAsentamiento
+ * @property-read ?Ciudad $ciudad
+ */
 class Asentamiento
 {
-    public $estado;
-    public $municipio;
-    public $clave;
-    public $nombre;
-    public $zona;
-    public $codigoPostal;
-    public $codigoPostalOficina;
+    private $estado;
+    private $municipio;
+    private $clave;
+    private $nombre;
+    private $zona;
+    private $codigoPostal;
+    private $codigoPostalOficina;
 
-    public $ciudad;
-    public $tipoAsentamiento;
+    private $ciudad;
+    private $tipoAsentamiento;
 
     public function __construct(
         Estado $estado,
@@ -35,5 +46,29 @@ class Asentamiento
         $this->codigoPostal = $codigoPostal;
         $this->codigoPostalOficina = $codigoPostalOficina;
         $this->ciudad = $ciudad;
+    }
+
+    public function __get($name)
+    {
+        switch ($name) {
+            case 'estado':
+                return $this->estado;
+            case 'municipio':
+                return $this->municipio;
+            case 'tipoAsentamiento':
+                return $this->tipoAsentamiento;
+            case 'clave':
+                return $this->clave;
+            case 'nombre':
+                return $this->nombre;
+            case 'zona':
+                return $this->zona;
+            case 'codigoPostal':
+                return $this->codigoPostal;
+            case 'codigoPostalOficina':
+                return $this->codigoPostalOficina;
+            case 'ciudad':
+                return $this->ciudad;
+        }
     }
 }

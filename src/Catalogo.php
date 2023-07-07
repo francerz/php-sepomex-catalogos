@@ -70,21 +70,19 @@ class Catalogo
                 }
                 /** @var DataRow */
                 $rc = $estadoIndex->first(['claveCiudad' => $cc]);
-                $ciudades["{$ce}-{$cc}"] = new Ciudad($estado, $rc->claveCiudad, $rc->nombreCiudad);
+                $ciudades["{$ce}-{$cc}"] = $estado->addCiudad($rc->claveCiudad, $rc->nombreCiudad);
             }
             foreach ($estadoIndex->getColumnValues('claveMunicipio') as $cm) {
                 /** @var DataRow[] */
                 $municipioData = $estadoIndex[['claveMunicipio' => $cm]];
                 $rm = reset($municipioData);
-                $municipios["{$ce}-{$cm}"] = $municipio = new Municipio($estado, $cm, $rm->nombreMunicipio);
+                $municipios["{$ce}-{$cm}"] = $municipio = $estado->addMunicipio($cm, $rm->nombreMunicipio);
 
                 $municipioIndex = new Index($municipioData, ['claveAsentamiento']);
                 foreach ($municipioIndex->getColumnValues('claveAsentamiento') as $ca) {
                     /** @var DataRow */
                     $ra = $municipioIndex->first(['claveAsentamiento' => $ca]);
-                    $asentamientos["{$ce}-{$cm}-{$ca}"] = new Asentamiento(
-                        $estado,
-                        $municipio,
+                    $asentamientos["{$ce}-{$cm}-{$ca}"] = $municipio->addAsentamiento(
                         $tiposAsentamiento[$ra->claveTipoAsentamiento],
                         $ra->claveAsentamiento,
                         $ra->nombreAsentamiento,
