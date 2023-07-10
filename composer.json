@@ -12,7 +12,9 @@
         }
     },
     "require": {
-        "francerz/php-power-data": "^0.1.29"
+        "francerz/php-power-data": "^0.1.29",
+        "psr/http-message": "^1.0",
+        "francerz/http-utils": "^0.2.52"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.6"

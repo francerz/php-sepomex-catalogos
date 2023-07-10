@@ -2,12 +2,14 @@
 
 namespace Francerz\SepomexCatalogos;
 
+use Francerz\Http\Utils\StreamWrapper;
 use Francerz\PowerData\Index;
 use Francerz\SepomexCatalogos\Model\Asentamiento;
 use Francerz\SepomexCatalogos\Model\Ciudad;
 use Francerz\SepomexCatalogos\Model\Estado;
 use Francerz\SepomexCatalogos\Model\Municipio;
 use Francerz\SepomexCatalogos\Model\TipoAsentamiento;
+use Psr\Http\Message\StreamInterface;
 
 /**
  * @property-read TipoAsentamiento[] $tiposAsentamiento
@@ -16,23 +18,10 @@ use Francerz\SepomexCatalogos\Model\TipoAsentamiento;
  * @property-read Ciudad[] $ciudades
  * @property-read Asentamiento[] $asentamientos
  */
-class Catalogo
+class CatalogoSepomex
 {
-    public static function fromTextFile(string $filepath)
+    private static function fromDataRowArray(array $rows)
     {
-        ini_set('memory_limit', -1);
-        $file = fopen($filepath, 'r');
-        $rows = [];
-        for ($x = 0; $x < 2; $x++) {
-            fgets($file);
-        }
-
-        // READS FILE LINE BY LINE
-        while ($line = trim(fgets($file))) {
-            $line = mb_convert_encoding($line, 'UTF-8', 'ISO-8859-1');
-            $rows[] = DataRow::fromLine($line);
-        }
-
         // CREATES INDEX WITH ROWS
         $rowsIndex = new Index($rows, [
             'claveEstado',
@@ -102,6 +91,40 @@ class Catalogo
             $ciudades,
             $asentamientos
         );
+    }
+
+    public static function fromTextFile(string $filepath)
+    {
+        ini_set('memory_limit', -1);
+        $file = fopen($filepath, 'r');
+        for ($x = 0; $x < 2; $x++) {
+            fgets($file);
+        }
+
+        // READS FILE LINE BY LINE
+        $rows = [];
+        while ($line = trim(fgets($file))) {
+            $line = mb_convert_encoding($line, 'UTF-8', 'ISO-8859-1');
+            $rows[] = DataRow::fromLine($line);
+        }
+
+        return static::fromDataRowArray($rows);
+    }
+
+    public static function fromStream(StreamInterface $stream)
+    {
+        ini_set('memory_limit', -1);
+        $wrapper = new StreamWrapper($stream);
+        for ($x = 0; $x < 2; $x++) {
+            $wrapper->readLine();
+        }
+
+        $rows = [];
+        while ($line = trim($wrapper->readLine())) {
+            $line = mb_convert_encoding($line, 'UTF-8', 'ISO-8859-1');
+            $rows[] = DataRow::fromLine($line);
+        }
+        return static::fromDataRowArray($rows);
     }
 
     private $tiposAsentamiento;
