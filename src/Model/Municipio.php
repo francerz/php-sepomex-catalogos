@@ -51,7 +51,6 @@ class Municipio
         ?Ciudad $ciudad = null
     ) {
         $asentamiento = new Asentamiento(
-            $this->estado,
             $this,
             $tipo,
             $clave,

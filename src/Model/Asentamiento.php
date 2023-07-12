@@ -15,7 +15,6 @@ namespace Francerz\SepomexCatalogos\Model;
  */
 class Asentamiento
 {
-    private $estado;
     private $municipio;
     private $clave;
     private $nombre;
@@ -27,7 +26,6 @@ class Asentamiento
     private $tipoAsentamiento;
 
     public function __construct(
-        Estado $estado,
         Municipio $municipio,
         TipoAsentamiento $tipoAsentamiento,
         string $clave,
@@ -37,7 +35,6 @@ class Asentamiento
         string $codigoPostalOficina,
         ?Ciudad $ciudad = null
     ) {
-        $this->estado = $estado;
         $this->municipio = $municipio;
         $this->tipoAsentamiento = $tipoAsentamiento;
         $this->clave = $clave;
@@ -52,7 +49,7 @@ class Asentamiento
     {
         switch ($name) {
             case 'estado':
-                return $this->estado;
+                return $this->municipio->estado->clave;
             case 'municipio':
                 return $this->municipio;
             case 'tipoAsentamiento':
